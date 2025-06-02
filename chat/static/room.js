@@ -1,35 +1,45 @@
-
 console.log("Sanity check from room.js.");
 
 const roomName = JSON.parse(document.getElementById('roomName').textContent);
 
-let chatLog = document.querySelector("#chatLog");
-let chatMessageInput = document.querySelector("#chatMessageInput");
-let chatMessageSend = document.querySelector("#chatMessageSend");
-let onlineUsersSelector = document.querySelector("#onlineUsersSelector");
+const chatLog = document.querySelector("#chatLog");
+const chatMessageInput = document.querySelector("#chatMessageInput");
+const chatMessageSend = document.querySelector("#chatMessageSend");
+const onlineUsersSelector = document.querySelector("#onlineUsersSelector");
 
-function onlineUsersSelectorAdd(value) {
-    if (document.querySelector("option[value='" + value + "']")) return;
-    let newOption = document.createElement("option");
-    newOption.value = value;
-    newOption.innerHTML = value;
+function addOnlineUser(username) {
+    if (document.querySelector(`option[value='${username}']`)) return;
+    
+    const newOption = document.createElement("option");
+    newOption.value = username;
+    newOption.textContent = username;
     onlineUsersSelector.appendChild(newOption);
 }
 
-function onlineUsersSelectorRemove(value) {
-    let oldOption = document.querySelector("option[value='" + value + "']");
-    if (oldOption !== null) oldOption.remove();
+function removeOnlineUser(username) {
+    const userOption = document.querySelector(`option[value='${username}']`);
+    if (userOption) {
+        userOption.remove();
+    }
 }
 
 chatMessageInput.focus();
 
-chatMessageInput.onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter key
-        chatMessageSend.click();
+chatMessageInput.addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
     }
-};
+});
 
-chatMessageSend.onclick = function() {
-    if (chatMessageInput.value.length === 0) return;
+chatMessageSend.addEventListener('click', sendMessage);
+
+function sendMessage() {
+    const message = chatMessageInput.value.trim();
+    if (message.length === 0) return;
+    
+    console.log(`ارسال پیام به اتاق ${roomName}: ${message}`);
+    
+    chatLog.value += `You: ${message}\n`;
     chatMessageInput.value = "";
-};
+}
+
