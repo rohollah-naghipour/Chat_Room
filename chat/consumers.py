@@ -88,3 +88,36 @@ class ChatConsumer(WebsocketConsumer):
 
     def user_leave(self, event):
         self.send(text_data=json.dumps(event))   
+
+
+    def connect(self):
+        # ...
+        self.user_inbox = f'inbox_{self.user.username}'  # new
+
+        # accept the incoming connection
+        self.accept()
+
+        # ...
+
+        if self.user.is_authenticated:
+            # -------------------- new --------------------
+            # create a user inbox for private messages
+            async_to_sync(self.channel_layer.group_add)(
+                self.user_inbox,
+                self.channel_name,
+            )
+            # ---------------- end of new ----------------
+            # ...
+
+    def disconnect(self, close_code):
+        # ...
+
+        if self.user.is_authenticated:
+            # -------------------- new --------------------
+            # delete the user inbox for private messages
+            async_to_sync(self.channel_layer.group_discard)(
+                self.user_inbox,
+                self.channel_name,
+            )
+            # ---------------- end of new ----------------
+            # ...
